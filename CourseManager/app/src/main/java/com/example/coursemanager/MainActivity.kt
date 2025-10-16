@@ -14,6 +14,7 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -37,8 +38,8 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CourseApp(viewModel: CourseViewModel = viewModel()) {
-    val courses by viewModel.courses
+fun CourseApp(viewModel: CourseViewModel = viewModel(factory = CourseViewModelFactory(LocalContext.current))) {
+    val courses by viewModel.courses.collectAsState()
     val selectedCourse by viewModel.selectedCourse
     val showAddDialog by viewModel.showAddDialog
 

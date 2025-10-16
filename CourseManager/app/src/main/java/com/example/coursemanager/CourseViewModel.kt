@@ -3,10 +3,23 @@ package com.example.coursemanager
 import androidx.lifecycle.ViewModel
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.State
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class CourseViewModel : ViewModel() {
-    private val _courses = mutableStateOf<List<Course>>(emptyList())
-    val courses: State<List<Course>> = _courses
+
+
+class CourseViewModel(private val repository: CourseRepository
+) : ViewModel() {
+    val courses: StateFlow<List<Course>> = repository.allCourses
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
+
 
     private val _selectedCourse = mutableStateOf<Course?>(null)
     val selectedCourse: State<Course?> = _selectedCourse
@@ -15,18 +28,22 @@ class CourseViewModel : ViewModel() {
     val showAddDialog: State<Boolean> = _showAddDialog
 
     fun addCourse(department: String, courseNumber: String, location: String) {
-        val newCourse = Course(
-            department = department.trim(),
-            courseNumber = courseNumber.trim(),
-            location = location.trim()
-        )
-        _courses.value = _courses.value + newCourse
+        viewModelScope.launch {
+            val newCourse = Course(
+                department = department.trim(),
+                courseNumber = courseNumber.trim(),
+                location = location.trim()
+            )
+            repository.insertCourse(newCourse)
+        }
     }
 
     fun deleteCourse(course: Course) {
-        _courses.value = _courses.value.filter { it.id != course.id }
-        if (_selectedCourse.value?.id == course.id) {
-            _selectedCourse.value = null
+        viewModelScope.launch {
+            repository.deleteCourse(course)
+            if (_selectedCourse.value?.id == course.id) {
+                _selectedCourse.value = null
+            }
         }
     }
 
