@@ -1,7 +1,7 @@
 package com.example.coursemanager
 
 data class Course(
-    val id: Long = System.currentTimeMillis(),
+    val id: Long = 0,
     val department: String,
     val courseNumber: String,
     val location: String
