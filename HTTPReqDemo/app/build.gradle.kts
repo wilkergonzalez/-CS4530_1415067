@@ -61,6 +61,8 @@ dependencies {
     implementation(libs.ktor.client.content.negotiation)
     implementation(libs.ktor.serialization.kotlinx.json)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.room.common.jvm)
+    implementation(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
